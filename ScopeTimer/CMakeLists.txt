@@ -1,10 +1,12 @@
 cmake_minimum_required(VERSION 2.6)
 project(ScopeTimer)
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 add_subdirectory(googletest/)
+set(CMAKE_PROJECT_VERSION 1)
 
 set(HEADER_FILE ScopeTimer.hpp)
 add_library(ScopeTimer ${HEADER_FILE} ScopeTimer.cpp)
+set_property(TARGET ScopeTimer PROPERTY CXX_STANDARD 17)
 target_include_directories(ScopeTimer PRIVATE include)
 
 #add_executable(main main.cpp)
