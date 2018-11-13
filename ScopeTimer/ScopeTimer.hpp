@@ -26,6 +26,6 @@ private:
     static ScopeTimer* s_currentTop;
     ScopeTimer* m_parent;
 
-    void writeToStream(const TimerResult& p_result, int p_deep = 0);
+    void writeToStream(const TimerResult& p_result, int p_deep = 0, bool p_lastChild = false);
     std::string ws(int p_deep);
 };

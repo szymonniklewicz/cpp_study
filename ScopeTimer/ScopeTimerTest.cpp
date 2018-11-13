@@ -68,6 +68,27 @@ std::map<std::string, std::string> g_expectedString =
             "    \"duration\": -?([0-9]+(\\.[0-9eE+\\-]+)?)\\n"
             "\\}\\n"             
         },
+        {
+            "ThreeVarsSameRootStreamDifferentScope",
+            "\\{\\n"
+            "    \"name\": \"Test timer1\",\\n"
+            "    \"subresults\": \\[\\n"
+            "        \\{\\n"
+            "            \"name\": \"Test timer1.1\",\\n"
+            "            \"subresults\": \\[\\n"
+            "            \\],\\n"
+            "            \"duration\": -?([0-9]+(\\.[0-9eE+\\-]+)?)\\n"
+            "        \\},\\n"
+            "        \\{\\n"
+            "            \"name\": \"Test timer1.2\",\\n"
+            "            \"subresults\": \\[\\n"
+            "            \\],\\n"
+            "            \"duration\": -?([0-9]+(\\.[0-9eE+\\-]+)?)\\n"
+            "        \\}\\n"
+            "    \\],\\n"
+            "    \"duration\": -?([0-9]+(\\.[0-9eE+\\-]+)?)\\n"
+            "\\}\\n"   
+        },
     };
 
 // Makes regex string printable to std::cout with proper formatting
@@ -179,4 +200,21 @@ TEST_F(ScopeTimerTest, ThreeVarsSameRootStreamTwoVarsInSameScope)
     }
     
     EXPECT_TRUE(checkRegex()) << buildErrorMsg();
+}
+
+TEST_F(ScopeTimerTest, ThreeVarsSameRootStreamDifferentScope)
+{
+    {
+        ScopeTimer l_timer1{m_stream, "Test timer1"};
+        {
+            {
+                ScopeTimer l_timer2{"Test timer1.1"};
+            }
+            {
+                ScopeTimer l_timer3{"Test timer1.2"};
+            }
+        }
+    }
+    
+    EXPECT_TRUE(checkRegex()) << buildErrorMsg(); 
 }
