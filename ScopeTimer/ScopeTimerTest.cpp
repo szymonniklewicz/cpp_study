@@ -89,6 +89,39 @@ std::map<std::string, std::string> g_expectedString =
             "    \"duration\": -?([0-9]+(\\.[0-9eE+\\-]+)?)\\n"
             "\\}\\n"   
         },
+        {
+            "FiveRecursiveVarsSameRootStream",
+            "\\{\\n"
+            "    \"name\": \"Test timer1\",\\n"
+            "    \"subresults\": \\[\\n"
+            "        \\{\\n" 
+            "            \"name\": \"Test timer2\",\\n"
+            "            \"subresults\": \\[\\n"
+            "                \\{\\n" 
+            "                    \"name\": \"Test timer3\",\\n"
+            "                    \"subresults\": \\[\\n"
+            "                        \\{\\n" 
+            "                            \"name\": \"Test timer4\",\\n"
+            "                            \"subresults\": \\[\\n"
+            "                                \\{\\n" 
+            "                                    \"name\": \"Test timer5\",\\n"
+            "                                    \"subresults\": \\[\\n"
+            "                                    \\],\\n"
+            "                                    \"duration\": -?([0-9]+(\\.[0-9eE+\\-]+)?)\\n"
+            "                                \\}\\n"
+            "                            \\],\\n"
+            "                            \"duration\": -?([0-9]+(\\.[0-9eE+\\-]+)?)\\n"
+            "                        \\}\\n"
+            "                    \\],\\n"
+            "                    \"duration\": -?([0-9]+(\\.[0-9eE+\\-]+)?)\\n"
+            "                \\}\\n"
+            "            \\],\\n"
+            "            \"duration\": -?([0-9]+(\\.[0-9eE+\\-]+)?)\\n"
+            "        \\}\\n"
+            "    \\],\\n"
+            "    \"duration\": -?([0-9]+(\\.[0-9eE+\\-]+)?)\\n"
+            "\\}\\n" 
+        },
     };
 
 // Makes regex string printable to std::cout with proper formatting
@@ -217,4 +250,25 @@ TEST_F(ScopeTimerTest, ThreeVarsSameRootStreamDifferentScope)
     }
     
     EXPECT_TRUE(checkRegex()) << buildErrorMsg(); 
+}
+
+TEST_F(ScopeTimerTest, FiveRecursiveVarsSameRootStream)
+{
+    {
+        ScopeTimer l_timer1{m_stream, "Test timer1"};
+        {
+            ScopeTimer l_timer2{"Test timer2"};
+            {
+                ScopeTimer l_timer3{"Test timer3"};
+                {
+                    ScopeTimer l_timer4{"Test timer4"};
+                    {
+                        ScopeTimer l_timer5{"Test timer5"};
+                    }
+                }
+            }
+        }
+    }
+
+    EXPECT_TRUE(checkRegex()) << buildErrorMsg();
 }
