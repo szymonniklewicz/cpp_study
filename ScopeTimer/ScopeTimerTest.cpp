@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <regex>
 #include <map>
+#include <vector>
 #include "ScopeTimer.hpp"
 
 // helper functions
@@ -165,11 +166,16 @@ std::regex getRegex()
 
 struct ScopeTimerTest : public testing::Test
 {
-    std::stringstream m_stream;
+    std::vector<std::stringstream> m_streams;
     
-    std::string getResult()
+    ScopeTimerTest() : m_streams(std::vector<std::stringstream>())
     {
-        return m_stream.str();
+        m_streams.push_back(std::stringstream{});
+    }
+
+    std::string getResult(int p_index = 0)
+    {
+        return m_streams[p_index].str();
     }
     
     std::string buildErrorMsg()
@@ -181,20 +187,37 @@ struct ScopeTimerTest : public testing::Test
     {
         return std::regex_match(getResult(), getRegex());
     }
+
+    std::stringstream& getStream(int p_index = 0) //TODO Need to proper check this func
+    {
+        if (p_index == 0)
+        {
+            return m_streams[0];
+        }
+        else if (p_index < m_streams.size())
+        {
+            return m_streams[p_index];
+        }
+        else
+        {
+            m_streams.push_back(std::stringstream{});
+            return getStream(p_index);
+        }
+    }
 };
 
 // test cases
 
 TEST_F(ScopeTimerTest, CanCreateScopeTimer)
 {
-    ScopeTimer l_scopeTimerWithStream{m_stream, "Test timer2"};
+    ScopeTimer l_scopeTimerWithStream{getStream(), "Test timer2"};
     ScopeTimer l_scopeTimer{"Test timer"};    
 }
 
 TEST_F(ScopeTimerTest, SingleVar)
 {
     {
-        ScopeTimer l_scopeTimer{m_stream, "Test timer"};
+        ScopeTimer l_scopeTimer{getStream(), "Test timer"};
     }
     
     EXPECT_TRUE(checkRegex()) << buildErrorMsg();
@@ -203,7 +226,7 @@ TEST_F(ScopeTimerTest, SingleVar)
 TEST_F(ScopeTimerTest, DoubleVarsSameRootStreamSameScope)
 {
     {
-        ScopeTimer l_timer1{m_stream, "Test timer1"};
+        ScopeTimer l_timer1{getStream(), "Test timer1"};
         ScopeTimer l_timer2{"Test timer1.1"};
     }
     
@@ -213,7 +236,7 @@ TEST_F(ScopeTimerTest, DoubleVarsSameRootStreamSameScope)
 TEST_F(ScopeTimerTest, DoubleVarsSameRootStreamInnerScope)
 {
     {
-        ScopeTimer l_timer1{m_stream, "Test timer1"};
+        ScopeTimer l_timer1{getStream(), "Test timer1"};
         {
             ScopeTimer l_timer2{"Test timer1.1"};
         }
@@ -225,7 +248,7 @@ TEST_F(ScopeTimerTest, DoubleVarsSameRootStreamInnerScope)
 TEST_F(ScopeTimerTest, ThreeVarsSameRootStreamTwoVarsInSameScope)
 {
     {
-        ScopeTimer l_timer1{m_stream, "Test timer1"};
+        ScopeTimer l_timer1{getStream(), "Test timer1"};
         {
             ScopeTimer l_timer2{"Test timer1.1"};
             ScopeTimer l_timer3{"Test timer1.2"};
@@ -238,7 +261,7 @@ TEST_F(ScopeTimerTest, ThreeVarsSameRootStreamTwoVarsInSameScope)
 TEST_F(ScopeTimerTest, ThreeVarsSameRootStreamDifferentScope)
 {
     {
-        ScopeTimer l_timer1{m_stream, "Test timer1"};
+        ScopeTimer l_timer1{getStream(), "Test timer1"};
         {
             {
                 ScopeTimer l_timer2{"Test timer1.1"};
@@ -255,7 +278,7 @@ TEST_F(ScopeTimerTest, ThreeVarsSameRootStreamDifferentScope)
 TEST_F(ScopeTimerTest, FiveRecursiveVarsSameRootStream)
 {
     {
-        ScopeTimer l_timer1{m_stream, "Test timer1"};
+        ScopeTimer l_timer1{getStream(), "Test timer1"};
         {
             ScopeTimer l_timer2{"Test timer2"};
             {
