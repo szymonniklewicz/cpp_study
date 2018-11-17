@@ -183,7 +183,7 @@ struct ScopeTimerTest : public testing::Test
         return "Expected: \n" + toRawString(getExpected()) + "\ngot: \n" + getResult() + "\n";
     }
     
-    bool checkRegex()
+    bool checkRegex() //TODO add multiple streams support
     {
         return std::regex_match(getResult(), getRegex());
     }
@@ -295,3 +295,34 @@ TEST_F(ScopeTimerTest, FiveRecursiveVarsSameRootStream)
 
     EXPECT_TRUE(checkRegex()) << buildErrorMsg();
 }
+
+TEST_F(ScopeTimerTest, TwoVarsSameScopeDifferentStream)
+{
+    {
+        ScopeTimer l_scopeTimer0{getStream(0), "ScopeTimer0"};
+        ScopeTimer l_scopeTimer1{getStream(1), "ScopeTimer1"};
+        EXPECT_TRUE(false);
+    }
+}
+
+// this test should produce cumulative output in each stream
+// TEST_F(ScopeTimerTest, FiveRecursiveVarsSameRootStream)
+// {
+//     {
+//         ScopeTimer l_timer1{m_stream, "Test timer1"};
+//         {
+//             ScopeTimer l_timer2{m_stream, "Test timer2"};
+//             {
+//                 ScopeTimer l_timer3{m_stream, "Test timer3"};
+//                 {
+//                     ScopeTimer l_timer4{m_stream, "Test timer4"};
+//                     {
+//                         ScopeTimer l_timer5{m_stream, "Test timer5"};
+//                     }
+//                 }
+//             }
+//         }
+//     }
+
+//     EXPECT_TRUE(checkRegex()) << buildErrorMsg();
+// }
